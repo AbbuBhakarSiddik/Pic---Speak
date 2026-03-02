@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speech Topics Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      font-size: 3em;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.2em;
+      margin-bottom: 40px;
+    }
+
+    .subtitle1 {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1.2em;
+      margin-bottom: 40px;
+      font-weight: bold;
+      font-family: 'Times New Roman', Times, serif;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .legend {
+      display: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+      perspective: 1000px;
+    }
+
+    .card {
+      height: 280px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-front {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      position: relative;
+    }
+
+    .card-front.easy {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .card-front.medium {
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .card-front.hard {
+      background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);
+    }
+
+    .card-icon {
+      font-size: 4em;
+      margin-bottom: 15px;
+      filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    .box-number {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 0.3s;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: slideUp 0.4s;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: #ff4757;
+      color: white;
+      border: none;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      font-size: 1.5em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+
+    .modal-close:hover {
+      background: #ff6b81;
+      transform: rotate(90deg);
+    }
+
+    .modal-icon {
+      font-size: 5em;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .topic-title {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 25px;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .hints {
+      width: 100%;
+    }
+
+    .hint-item {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px;
+      margin: 12px 0;
+      border-radius: 10px;
+      font-size: 1em;
+      line-height: 1.5;
+    }
+
+    .hint-number {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: white;
+      font-weight: 600;
+    }
+
+    .legend-color {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2em;
+      }
+
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+      }
+
+      .card {
+        height: 240px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Speech Topics Box</h1>
+    <p class="subtitle1">Presented by Creative Codex Club</p>
+    <p class="subtitle">Click any box to reveal your topic with hints!</p>
+
+    <div class="grid" id="cardsGrid"></div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div class="modal-icon" id="modalIcon"></div>
+      <div class="topic-title" id="modalTitle"></div>
+      <div class="hints" id="modalHints"></div>
+    </div>
+  </div>
+
+  <script>
+    const topics = [
+      // EASY (10)
+      {
+        difficulty: "easy",
+        icon: "📱",
+        title: "Social Media's Impact on Daily Life",
+        hints: [
+          "Discuss how platforms like Instagram and TikTok shape our routines",
+          "Mention both positive connections and negative effects like FOMO",
+          "Conclude with tips for healthy social media habits"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "🎮",
+        title: "The Rise of Gaming as a Career",
+        hints: [
+          "Explain esports and streaming platforms like Twitch",
+          "Share statistics about gaming industry revenue",
+          "Discuss skills gamers develop beyond entertainment"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "🤖",
+        title: "AI Assistants in Our Homes",
+        hints: [
+          "Talk about Alexa, Siri, and Google Assistant features",
+          "Explain how they make daily tasks easier",
+          "Address privacy concerns briefly"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "📸",
+        title: "How Smartphones Changed Photography",
+        hints: [
+          "Compare traditional cameras to phone cameras",
+          "Discuss Instagram and photo-sharing culture",
+          "Mention accessibility of photography for everyone"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "🎵",
+        title: "Streaming Services vs Traditional Music",
+        hints: [
+          "Compare Spotify, Apple Music to buying CDs",
+          "Discuss how artists earn money differently now",
+          "Talk about playlist culture and music discovery"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "💬",
+        title: "The Evolution of Online Communication",
+        hints: [
+          "Trace from email to instant messaging to video calls",
+          "Highlight how emojis became a universal language",
+          "Discuss the impact on long-distance relationships"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "🛒",
+        title: "Online Shopping Revolution",
+        hints: [
+          "Compare Amazon, fast delivery to traditional retail",
+          "Discuss convenience vs local business impact",
+          "Mention the rise of unboxing culture"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "📺",
+        title: "Binge-Watching Culture on Netflix",
+        hints: [
+          "Explain how streaming changed TV consumption",
+          "Discuss the 'one more episode' phenomenon",
+          "Address both entertainment value and health concerns"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "🔐",
+        title: "Why Password Security Matters",
+        hints: [
+          "Explain common password mistakes people make",
+          "Introduce password managers as a solution",
+          "Share tips for creating strong, memorable passwords"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "☁️",
+        title: "Cloud Storage: Your Files Everywhere",
+        hints: [
+          "Explain what cloud storage is in simple terms",
+          "Compare Google Drive, Dropbox, iCloud benefits",
+          "Address how it makes collaboration easier"
+        ]
+      },
+      // MEDIUM (8)
+      {
+        difficulty: "medium",
+        icon: "🧠",
+        title: "Machine Learning in Everyday Apps",
+        hints: [
+          "Explain how Netflix recommendations and Spotify Discover work",
+          "Discuss facial recognition in photo apps",
+          "Analyze the balance between personalization and privacy"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "🌐",
+        title: "The Metaverse: Hype or Future?",
+        hints: [
+          "Define the metaverse and current examples (VR Chat, Horizon)",
+          "Discuss potential applications in work, education, entertainment",
+          "Evaluate challenges like cost, accessibility, and social concerns"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "⚡",
+        title: "Electric Vehicles and Tech Innovation",
+        hints: [
+          "Explain Tesla's influence on auto industry tech adoption",
+          "Discuss battery technology and charging infrastructure",
+          "Address environmental impact vs manufacturing concerns"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "🔗",
+        title: "Blockchain Beyond Cryptocurrency",
+        hints: [
+          "Explain blockchain technology in accessible terms",
+          "Discuss supply chain tracking, digital contracts applications",
+          "Evaluate real-world adoption challenges"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "👁️",
+        title: "Digital Privacy in 2025",
+        hints: [
+          "Analyze how apps collect and use personal data",
+          "Discuss GDPR, privacy regulations impact",
+          "Offer practical steps individuals can take to protect themselves"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "💊",
+        title: "Telemedicine and Healthcare Tech",
+        hints: [
+          "Explain how virtual doctor visits became mainstream",
+          "Discuss wearable health monitors (Apple Watch, Fitbit)",
+          "Evaluate accessibility improvements vs limitations"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "🏠",
+        title: "Smart Homes: Connected Living",
+        hints: [
+          "Describe IoT devices and home automation systems",
+          "Discuss energy efficiency and convenience benefits",
+          "Address security vulnerabilities and privacy risks"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "🎓",
+        title: "Online Learning Platforms Reshaping Education",
+        hints: [
+          "Compare Coursera, Udemy, Khan Academy to traditional education",
+          "Discuss accessibility and self-paced learning advantages",
+          "Analyze challenges like motivation and credential recognition"
+        ]
+      },
+      // HARD (7)
+      {
+        difficulty: "hard",
+        icon: "🧬",
+        title: "Quantum Computing's Potential and Perils",
+        hints: [
+          "Explain quantum computing fundamentals vs classical computing",
+          "Discuss breakthrough applications in drug discovery, cryptography",
+          "Analyze timeline challenges and cybersecurity implications for encryption"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "⚖️",
+        title: "AI Ethics and Algorithmic Bias",
+        hints: [
+          "Examine real cases of bias in facial recognition, hiring algorithms",
+          "Discuss who should regulate AI and how",
+          "Propose frameworks for ethical AI development and deployment"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "🌍",
+        title: "Global Tech Regulation Competition",
+        hints: [
+          "Compare EU's strict approach vs US tech-friendly policies vs China's model",
+          "Analyze how different regulations affect innovation and privacy",
+          "Discuss implications for users and tech companies globally"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "🔬",
+        title: "Brain-Computer Interfaces: Neuralink Era",
+        hints: [
+          "Explain current BCI technology and Neuralink's goals",
+          "Discuss medical applications vs enhancement ethical debates",
+          "Analyze societal implications of merging human cognition with AI"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "🏭",
+        title: "Automation's Impact on Employment",
+        hints: [
+          "Analyze which job sectors face highest automation risk",
+          "Discuss reskilling initiatives and universal basic income debates",
+          "Propose policy frameworks for economic transition management"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "🛡️",
+        title: "Cybersecurity in Critical Infrastructure",
+        hints: [
+          "Examine recent attacks on power grids, hospitals, pipelines",
+          "Discuss nation-state actors vs criminal organizations",
+          "Analyze defense strategies and international cooperation needs"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "💡",
+        title: "The Future of Work: Remote, Hybrid, or Return?",
+        hints: [
+          "Analyze productivity data and worker preference studies post-pandemic",
+          "Discuss implications for urban planning, real estate, and inequality",
+          "Evaluate how technology enables or limits different work models"
+        ]
+      }
+    ];
+
+    const icons = ['📱', '💻', '🌐', '🤖', '🎮', '📸', '🎵', '💬', '🛒', '📺'];
+
+    function createCard(topic, index) {
+      const boxNumber = index + 1;
+      return `
+                <div class="card" onclick="openModal(${index})">
+                    <div class="card-face card-front ${topic.difficulty}">
+                        <div class="box-number">${boxNumber}</div>
+                        <div class="card-icon">${topic.icon}</div>
+                    </div>
+                </div>
+            `;
+    }
+
+    function openModal(index) {
+      const topic = shuffledTopics[index];
+      document.getElementById('modalIcon').textContent = topic.icon;
+      document.getElementById('modalTitle').textContent = topic.title;
+      document.getElementById('modalHints').innerHTML = topic.hints.map((hint, i) => `
+                <div class="hint-item">
+                    <span class="hint-number">💡 ${i + 1}:</span> ${hint}
+                </div>
+            `).join('');
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('modalOverlay').addEventListener('click', function (e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    // Shuffle topics for randomness
+    const shuffledTopics = topics.sort(() => Math.random() - 0.5);
+
+    // Render all cards
+    document.getElementById('cardsGrid').innerHTML = shuffledTopics
+      .map((topic, index) => createCard(topic, index))
+      .join('');
+  </script>
+</body>
+
+</html>
