@@ -53,6 +53,13 @@
       display: none;
     }
 
+    .section-divider {
+      height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+      margin: 60px 0 40px;
+      border: none;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -279,9 +286,17 @@
   <div class="container">
     <h1>Tech Speak Roulette</h1>
     <p class="subtitle1">Presented by Creative Codex Club</p>
+    <div class="section-divider"></div>
+    <h1>Teams Participants</h1>
     <p class="subtitle">Click any box to reveal your topic with hints!</p>
 
     <div class="grid" id="cardsGrid"></div>
+
+    <div class="section-divider"></div>
+    <h1>Solo Participants</h1>
+    <p class="subtitle">Click any box to reveal your solo topic with hints!</p>
+
+    <div class="grid" id="soloCardsGrid"></div>
   </div>
 
   <div class="modal-overlay" id="modalOverlay">
@@ -550,12 +565,266 @@
       }
     ];
 
-    const icons = ['📱', '💻', '🌐', '🤖', '🎮', '📸', '🎵', '💬', '🛒', '📺'];
+    const soloTopics = [
+      // EASY (10)
+      {
+        difficulty: "easy",
+        icon: "🖥️",
+        title: "The History of Personal Computers",
+        hints: [
+          "Trace the journey from bulky desktops to sleek laptops",
+          "Mention key milestones like Windows 95 and the MacBook",
+          "Discuss how PCs became essential in every household"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "📧",
+        title: "Email Etiquette in the Digital Age",
+        hints: [
+          "Discuss the dos and don'ts of professional emails",
+          "Talk about spam, phishing, and how to spot them",
+          "Mention the shift to Slack and Teams for workplace communication"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "🗺️",
+        title: "GPS and Navigation Apps",
+        hints: [
+          "Explain how GPS technology works in simple terms",
+          "Compare Google Maps, Waze, and Apple Maps features",
+          "Discuss how navigation apps changed travel and commuting"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "🎧",
+        title: "The Podcast Revolution",
+        hints: [
+          "Discuss the rise of podcasts as a media format",
+          "Mention popular genres: true crime, tech, self-improvement",
+          "Explain how anyone can start their own podcast today"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "📝",
+        title: "Digital Note-Taking vs. Pen and Paper",
+        hints: [
+          "Compare apps like Notion, OneNote to traditional notebooks",
+          "Discuss productivity and organization benefits",
+          "Mention studies on memory retention with handwriting"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "🎥",
+        title: "The Rise of YouTube Content Creators",
+        hints: [
+          "Discuss how YouTube turned hobbies into careers",
+          "Mention different content niches: education, vlogs, reviews",
+          "Talk about the creator economy and monetization"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "🔋",
+        title: "Battery Technology and Our Device Dependency",
+        hints: [
+          "Discuss the evolution of batteries from NiCd to lithium-ion",
+          "Talk about fast charging and wireless charging trends",
+          "Mention the anxiety around low battery in modern life"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "🎤",
+        title: "Voice Search and Its Growing Popularity",
+        hints: [
+          "Explain how voice search works with examples",
+          "Discuss its impact on SEO and content creation",
+          "Mention accessibility benefits for differently-abled users"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "🖨️",
+        title: "3D Printing for Beginners",
+        hints: [
+          "Explain what 3D printing is and how it works simply",
+          "Discuss cool use cases: toys, prototypes, prosthetics",
+          "Mention how affordable 3D printers have become"
+        ]
+      },
+      {
+        difficulty: "easy",
+        icon: "📲",
+        title: "Mobile Payment Systems: Tap and Go",
+        hints: [
+          "Discuss UPI, Apple Pay, Google Pay and how they work",
+          "Talk about the convenience of cashless transactions",
+          "Mention security features and fraud prevention"
+        ]
+      },
+      // MEDIUM (8)
+      {
+        difficulty: "medium",
+        icon: "🛰️",
+        title: "Satellite Internet: Connecting the Unconnected",
+        hints: [
+          "Explain Starlink and other satellite internet projects",
+          "Discuss benefits for rural and remote area connectivity",
+          "Analyze challenges like latency, cost, and space debris"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "🧩",
+        title: "Low-Code and No-Code Platforms",
+        hints: [
+          "Explain what low-code/no-code means with examples",
+          "Discuss how they empower non-developers to build apps",
+          "Evaluate limitations and when traditional coding is still needed"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "🎭",
+        title: "Deepfakes: Technology and Disinformation",
+        hints: [
+          "Explain how deepfake technology works using AI",
+          "Discuss real-world cases of deepfake misuse",
+          "Evaluate detection methods and regulatory responses"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "🏗️",
+        title: "Digital Twins in Industry",
+        hints: [
+          "Define digital twins and their purpose in manufacturing",
+          "Discuss applications in urban planning and healthcare",
+          "Analyze the data infrastructure required to support them"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "♻️",
+        title: "E-Waste: The Hidden Cost of Tech",
+        hints: [
+          "Discuss the growing problem of electronic waste globally",
+          "Explain recycling challenges and toxic material concerns",
+          "Propose sustainable tech consumption practices"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "🔍",
+        title: "Search Engine Algorithms and Information Bubbles",
+        hints: [
+          "Explain how search algorithms rank and filter content",
+          "Discuss the concept of filter bubbles and echo chambers",
+          "Analyze the impact on public opinion and democracy"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "🚁",
+        title: "Drone Technology Beyond Photography",
+        hints: [
+          "Discuss drone applications in delivery, agriculture, and rescue",
+          "Explain regulatory frameworks like FAA rules",
+          "Evaluate privacy concerns and airspace management challenges"
+        ]
+      },
+      {
+        difficulty: "medium",
+        icon: "🧪",
+        title: "Biometric Authentication: Beyond Fingerprints",
+        hints: [
+          "Discuss facial recognition, iris scans, and voice authentication",
+          "Explain how biometrics improve security over passwords",
+          "Analyze privacy and data storage risks with biometric data"
+        ]
+      },
+      // HARD (7)
+      {
+        difficulty: "hard",
+        icon: "🌌",
+        title: "Space Technology and Commercialization",
+        hints: [
+          "Discuss SpaceX, Blue Origin and the privatization of space",
+          "Analyze the economics of space tourism and satellite launches",
+          "Evaluate geopolitical implications of commercial space dominance"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "🧮",
+        title: "The Ethics of Predictive Policing Algorithms",
+        hints: [
+          "Explain how predictive policing systems use data and AI",
+          "Discuss documented cases of racial and socioeconomic bias",
+          "Propose alternative approaches that balance safety and fairness"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "🔮",
+        title: "AGI: When Machines Surpass Human Intelligence",
+        hints: [
+          "Define AGI and contrast it with narrow AI we use today",
+          "Discuss expert timelines and the alignment problem",
+          "Analyze existential risk frameworks and safety research efforts"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "⚗️",
+        title: "CRISPR and the Ethics of Gene Editing",
+        hints: [
+          "Explain CRISPR-Cas9 technology and its capabilities",
+          "Discuss therapeutic applications vs designer baby concerns",
+          "Analyze global regulatory differences and moral frameworks"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "📡",
+        title: "Digital Sovereignty and Data Localization",
+        hints: [
+          "Explain what digital sovereignty means for nations",
+          "Discuss data localization laws and their impact on tech companies",
+          "Analyze the tension between global internet and national control"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "🤝",
+        title: "Open Source vs Proprietary Software Debate",
+        hints: [
+          "Compare the philosophies of open source and proprietary models",
+          "Discuss economic sustainability and community contributions",
+          "Analyze real-world examples: Linux vs Windows, Android vs iOS"
+        ]
+      },
+      {
+        difficulty: "hard",
+        icon: "🧬",
+        title: "Synthetic Biology and Biocomputing",
+        hints: [
+          "Explain how biology is being engineered like software",
+          "Discuss DNA data storage and biological computing concepts",
+          "Analyze biosecurity risks and the need for governance frameworks"
+        ]
+      }
+    ];
 
-    function createCard(topic, index) {
+    function createCard(topic, index, gridType) {
       const boxNumber = index + 1;
       return `
-                <div class="card" onclick="openModal(${index})">
+                <div class="card" onclick="openModal(${index}, '${gridType}')">
                     <div class="card-face card-front ${topic.difficulty}">
                         <div class="box-number">${boxNumber}</div>
                         <div class="card-icon">${topic.icon}</div>
@@ -564,8 +833,8 @@
             `;
     }
 
-    function openModal(index) {
-      const topic = shuffledTopics[index];
+    function openModal(index, gridType) {
+      const topic = gridType === 'solo' ? shuffledSoloTopics[index] : shuffledTopics[index];
       document.getElementById('modalIcon').textContent = topic.icon;
       document.getElementById('modalTitle').textContent = topic.title;
       document.getElementById('modalHints').innerHTML = topic.hints.map((hint, i) => `
@@ -596,10 +865,15 @@
 
     // Shuffle topics for randomness
     const shuffledTopics = topics.sort(() => Math.random() - 0.5);
+    const shuffledSoloTopics = soloTopics.sort(() => Math.random() - 0.5);
 
     // Render all cards
     document.getElementById('cardsGrid').innerHTML = shuffledTopics
-      .map((topic, index) => createCard(topic, index))
+      .map((topic, index) => createCard(topic, index, 'group'))
+      .join('');
+
+    document.getElementById('soloCardsGrid').innerHTML = shuffledSoloTopics
+      .map((topic, index) => createCard(topic, index, 'solo'))
       .join('');
   </script>
 </body>
